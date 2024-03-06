@@ -24,7 +24,7 @@ class UsersDB {
       id: randomUUID(),
       login: postUser.login,
       password: createHash('sha256').update(postUser.password).digest('hex'),
-      version: 0,
+      version: 1,
       createdAt: time,
       updatedAt: time,
     };
@@ -50,7 +50,10 @@ class UsersDB {
   }
 
   deleteUser(id: string) {
+    const foundUser = this.getUserById(id);
+    if (!foundUser) return false;
     this.usersMap.delete(id);
+    return true;
   }
 }
 
