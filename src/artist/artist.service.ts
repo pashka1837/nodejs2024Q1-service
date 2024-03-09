@@ -4,6 +4,7 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { artistsDB } from 'db/artist/artistDB';
 import { albumsDB } from 'db/album/artistDB';
 import { tracksDB } from 'db/track/tracksDB';
+import { favsDB } from 'db/favs/favsDB';
 
 @Injectable()
 export class ArtistService {
@@ -38,6 +39,7 @@ export class ArtistService {
     tracksDB.getTracks().forEach((track) => {
       if (track.artistId === id) track.artistId = null;
     });
+    favsDB.deleteArtist(id);
     return { status: 204, data: { msg: 'Artist has been deleted' } };
   }
 }

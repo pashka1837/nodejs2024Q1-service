@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { tracksDB } from 'db/track/tracksDB';
+import { favsDB } from 'db/favs/favsDB';
 
 @Injectable()
 export class TrackService {
@@ -33,6 +34,7 @@ export class TrackService {
     // tracksDB.getTracks().forEach((album) => {
     //   if (album.artistId === id) album.artistId = null;
     // });
+    favsDB.deleteTrack(id);
     return { status: 204, data: { msg: 'Track has been deleted' } };
   }
 }

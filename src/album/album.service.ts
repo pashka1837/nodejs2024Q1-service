@@ -3,6 +3,7 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { albumsDB } from 'db/album/artistDB';
 import { tracksDB } from 'db/track/tracksDB';
+import { favsDB } from 'db/favs/favsDB';
 
 @Injectable()
 export class AlbumService {
@@ -34,6 +35,7 @@ export class AlbumService {
     tracksDB.getTracks().forEach((track) => {
       if (track.albumId === id) track.albumId = null;
     });
+    favsDB.deleteAlbum(id);
     return { status: 204, data: { msg: 'Album has been deleted' } };
   }
 }
