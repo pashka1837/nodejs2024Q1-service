@@ -3,34 +3,33 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
-  Res,
-  Put,
-  ParseUUIDPipe,
   UsePipes,
   ValidationPipe,
+  Put,
+  Res,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-user.dto';
+import { AlbumService } from './album.service';
+import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Response } from 'express';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('album')
+export class AlbumController {
+  constructor(private readonly albumService: AlbumService) {}
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  create(@Res() response: Response, @Body() postUser: CreateUserDto) {
-    const { status, data } = this.userService.create(postUser);
+  create(@Res() response: Response, @Body() createAlbumDto: CreateAlbumDto) {
+    const { status, data } = this.albumService.create(createAlbumDto);
     return response.status(status).json(data);
   }
 
   @Get()
   findAll(@Res() response: Response) {
-    const { status, data } = this.userService.findAll();
+    const { status, data } = this.albumService.findAll();
     return response.status(status).json(data);
   }
 
@@ -39,7 +38,7 @@ export class UserController {
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
-    const { status, data } = this.userService.findOne(id);
+    const { status, data } = this.albumService.findOne(id);
     return response.status(status).json(data);
   }
 
@@ -48,9 +47,9 @@ export class UserController {
   update(
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    const { status, data } = this.userService.update(id, updatePasswordDto);
+    const { status, data } = this.albumService.update(id, updateAlbumDto);
     return response.status(status).json(data);
   }
 
@@ -59,7 +58,7 @@ export class UserController {
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
-    const { status, data } = this.userService.remove(id);
+    const { status, data } = this.albumService.remove(id);
     return response.status(status).json(data);
   }
 }

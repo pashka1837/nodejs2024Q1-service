@@ -8,6 +8,8 @@ import {
   Put,
   Res,
   ParseUUIDPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -19,6 +21,7 @@ export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   create(@Res() response: Response, @Body() createArtistDto: CreateArtistDto) {
     const { status, data } = this.artistService.create(createArtistDto);
     return response.status(status).json(data);
@@ -40,6 +43,7 @@ export class ArtistController {
   }
 
   @Put(':id')
+  @UsePipes(new ValidationPipe({ transform: true }))
   update(
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,

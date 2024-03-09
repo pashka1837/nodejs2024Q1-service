@@ -2,16 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { artistsDB } from 'db/artist/artistDB';
+import { albumsDB } from 'db/album/artistDB';
+import { tracksDB } from 'db/track/tracksDB';
 
 @Injectable()
 export class ArtistService {
   create(createArtistDto: CreateArtistDto) {
-    if (
-      typeof createArtistDto.grammy !== 'boolean' ||
-      !createArtistDto.name ||
-      typeof createArtistDto.name !== 'string'
-    )
-      return { status: 400, data: { msg: 'Doesn`t contain required fields' } };
     const newArtist = artistsDB.postArtist(createArtistDto);
     return { status: 201, data: newArtist };
   }
@@ -28,20 +24,20 @@ export class ArtistService {
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    if (
-      typeof updateArtistDto.grammy !== 'boolean' ||
-      !updateArtistDto.name ||
-      typeof updateArtistDto.name !== 'string'
-    )
-      return { status: 400, data: { msg: 'Doesn`t contain required fields' } };
     const updArtist = artistsDB.putArtist(updateArtistDto, id);
     if (!updArtist) return { status: 404, data: { msg: 'Artist not found' } };
     return { status: 200, data: updArtist };
   }
 
   remove(id: string) {
-    return artistsDB.deleteUser(id)
-      ? { status: 204, data: { msg: 'Artist has been deleted' } }
-      : { status: 404, data: { msg: 'Artist not found' } };
+    const isArtistDel = artistsDB.deleteUser(id);
+    if (!isArtistDel) return { status: 404, data: { msg: 'Artist not found' } };
+    albumsDB.getAlbums().forEach((album) => {
+      if (album.artistId === id) album.artistId = null;
+    });
+    tracksDB.getTracks().forEach((track) => {
+      if (track.artistId === id) track.artistId = null;
+    });
+    return { status: 204, data: { msg: 'Artist has been deleted' } };
   }
 }

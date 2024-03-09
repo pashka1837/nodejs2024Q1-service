@@ -3,34 +3,33 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
-  Res,
   Put,
-  ParseUUIDPipe,
   UsePipes,
   ValidationPipe,
+  Res,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-user.dto';
+import { TrackService } from './track.service';
+import { CreateTrackDto } from './dto/create-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
 import { Response } from 'express';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('track')
+export class TrackController {
+  constructor(private readonly trackService: TrackService) {}
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  create(@Res() response: Response, @Body() postUser: CreateUserDto) {
-    const { status, data } = this.userService.create(postUser);
+  create(@Res() response: Response, @Body() createTrackDto: CreateTrackDto) {
+    const { status, data } = this.trackService.create(createTrackDto);
     return response.status(status).json(data);
   }
 
   @Get()
   findAll(@Res() response: Response) {
-    const { status, data } = this.userService.findAll();
+    const { status, data } = this.trackService.findAll();
     return response.status(status).json(data);
   }
 
@@ -39,7 +38,7 @@ export class UserController {
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
-    const { status, data } = this.userService.findOne(id);
+    const { status, data } = this.trackService.findOne(id);
     return response.status(status).json(data);
   }
 
@@ -48,9 +47,9 @@ export class UserController {
   update(
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    const { status, data } = this.userService.update(id, updatePasswordDto);
+    const { status, data } = this.trackService.update(id, updateTrackDto);
     return response.status(status).json(data);
   }
 
@@ -59,7 +58,7 @@ export class UserController {
     @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
-    const { status, data } = this.userService.remove(id);
+    const { status, data } = this.trackService.remove(id);
     return response.status(status).json(data);
   }
 }

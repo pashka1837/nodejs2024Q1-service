@@ -6,13 +6,6 @@ import { usersDB } from 'db/users/usersDB';
 @Injectable()
 export class UserService {
   create(postUser: CreateUserDto) {
-    if (
-      !postUser.login ||
-      typeof postUser.login !== 'string' ||
-      !postUser.password ||
-      typeof postUser.password !== 'string'
-    )
-      return { status: 400, data: { msg: 'Doesn`t contain required fields' } };
     const newUser = usersDB.postUser(postUser);
     delete newUser.password;
     return { status: 201, data: newUser };
@@ -31,14 +24,6 @@ export class UserService {
   }
 
   update(id: string, putData: UpdatePasswordDto) {
-    if (
-      !putData.oldPassword ||
-      typeof putData.oldPassword !== 'string' ||
-      !putData.newPassword ||
-      typeof putData.newPassword !== 'string'
-    )
-      return { status: 400, data: { msg: 'Doesn`t contain required fields' } };
-
     const user = usersDB.getUserById(id);
     if (!user) return { status: 404, data: { msg: 'User not found' } };
     const updUser = { ...usersDB.putUser(putData, user) };
