@@ -1,10 +1,10 @@
 interface User {
-  id: string; // uuid v4
+  id: string;
   login: string;
   password: string;
-  version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
+  version: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface CreateUserDto {
@@ -13,8 +13,8 @@ interface CreateUserDto {
 }
 
 interface UpdatePasswordDto {
-  oldPassword: string; // previous password
-  newPassword: string; // new password
+  oldPassword: string;
+  newPassword: string;
 }
 
 export { User, CreateUserDto, UpdatePasswordDto };
