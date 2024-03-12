@@ -8,13 +8,19 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/pashka1837/nodejs2024Q1-service.git
 ```
 
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Rename 
+
+```
+.env.example file to .env
 ```
 
 ## Running application
@@ -41,18 +47,6 @@ To run only one of all test suites
 
 ```
 npm run test -- <path to suite>
-```
-
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
 ```
 
 ### Auto-fix and format
