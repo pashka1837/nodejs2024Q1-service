@@ -1,42 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { usersDB } from 'db/users/usersDB';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(postUser: CreateUserDto) {
-    const newUser = usersDB.postUser(postUser);
-    delete newUser.password;
-    return { status: 201, data: newUser };
+  constructor(private prisma: PrismaService) {}
+  async create(postUser: CreateUserDto) {
+    const newUser = await this.prisma.user.create({ data: { ...postUser } });
+    console.log(new UserEntity(newUser));
+    return new UserEntity(newUser);
   }
 
-  findAll() {
-    const users = usersDB.getUsers();
-    return { status: 200, data: users };
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+    return users.map((user) => new UserEntity(user));
   }
 
-  findOne(id: string) {
-    const user = { ...usersDB.getUserById(id) };
-    if (!user.id) return { status: 404, data: { msg: 'User not found' } };
-    delete user.password;
-    return { status: 200, data: user };
-  }
-
-  update(id: string, putData: UpdatePasswordDto) {
-    const user = usersDB.getUserById(id);
-    if (!user) return { status: 404, data: { msg: 'User not found' } };
-    const updUser = { ...usersDB.putUser(putData, user) };
-    if (updUser.id) {
-      delete updUser.password;
-      return { status: 200, data: updUser };
+  async findOne(id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: id },
+      });
+      return new UserEntity(user);
+    } catch {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    return { status: 403, data: { msg: 'Wrong password' } };
   }
 
-  remove(id: string) {
-    return usersDB.deleteUser(id)
-      ? { status: 204, data: { msg: 'User has been deleted' } }
-      : { status: 404, data: { msg: 'User not found' } };
+  async update(id: string, putData: UpdatePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (user.password !== putData.oldPassword)
+      throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
+    const updUser = await this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        password: putData.newPassword,
+        version: user.version + 1,
+      },
+    });
+    return new UserEntity(updUser);
+  }
+
+  async remove(id: string) {
+    try {
+      const del = await this.prisma.user.delete({ where: { id: id } });
+      console.log(del);
+    } catch (error) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
   }
 }
