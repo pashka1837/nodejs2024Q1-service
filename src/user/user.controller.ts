@@ -5,11 +5,8 @@ import {
   Body,
   Param,
   Delete,
-  Res,
   Put,
   ParseUUIDPipe,
-  UsePipes,
-  ValidationPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -23,7 +20,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
   async create(@Body() postUser: CreateUserDto): Promise<UserEntity> {
     return await this.userService.create(postUser);
   }
@@ -39,7 +35,6 @@ export class UserController {
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,

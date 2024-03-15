@@ -8,9 +8,15 @@ import { UserEntity } from './entities/user.entity';
 export class UserService {
   constructor(private prisma: PrismaService) {}
   async create(postUser: CreateUserDto) {
-    const newUser = await this.prisma.user.create({ data: { ...postUser } });
-    console.log(new UserEntity(newUser));
-    return new UserEntity(newUser);
+    try {
+      const newUser = await this.prisma.user.create({ data: { ...postUser } });
+      return new UserEntity(newUser);
+    } catch {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findAll() {
@@ -52,8 +58,7 @@ export class UserService {
 
   async remove(id: string) {
     try {
-      const del = await this.prisma.user.delete({ where: { id: id } });
-      console.log(del);
+      await this.prisma.user.delete({ where: { id: id } });
     } catch (error) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }

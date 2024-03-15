@@ -1,45 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { artistsDB } from 'db/artist/artistDB';
-import { albumsDB } from 'db/album/artistDB';
-import { tracksDB } from 'db/track/tracksDB';
-import { favsDB } from 'db/favs/favsDB';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ArtistEntity } from './entities/artist.entity';
 
 @Injectable()
 export class ArtistService {
-  create(createArtistDto: CreateArtistDto) {
-    const newArtist = artistsDB.postArtist(createArtistDto);
-    return { status: 201, data: newArtist };
+  constructor(private prisma: PrismaService) {}
+  async create(createArtistDto: CreateArtistDto) {
+    try {
+      const newArtist = await this.prisma.artist.create({
+        data: { ...createArtistDto },
+      });
+      return new ArtistEntity(newArtist);
+    } catch {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  findAll() {
-    const artists = artistsDB.getArtists();
-    return { status: 200, data: artists };
+  async findAll() {
+    try {
+      const artists = await this.prisma.artist.findMany();
+      return artists.map((art) => new ArtistEntity(art));
+    } catch {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  findOne(id: string) {
-    const artist = artistsDB.getArtistById(id);
-    if (!artist) return { status: 404, data: { msg: 'Artist not found' } };
-    return { status: 200, data: artist };
-  }
-
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const updArtist = artistsDB.putArtist(updateArtistDto, id);
-    if (!updArtist) return { status: 404, data: { msg: 'Artist not found' } };
-    return { status: 200, data: updArtist };
-  }
-
-  remove(id: string) {
-    const isArtistDel = artistsDB.deleteUser(id);
-    if (!isArtistDel) return { status: 404, data: { msg: 'Artist not found' } };
-    albumsDB.getAlbums().forEach((album) => {
-      if (album.artistId === id) album.artistId = null;
+  async findOne(id: string) {
+    // try {
+    const artist = await this.prisma.artist.findUnique({
+      where: { id: id },
     });
-    tracksDB.getTracks().forEach((track) => {
-      if (track.artistId === id) track.artistId = null;
-    });
-    favsDB.deleteArtist(id);
-    return { status: 204, data: { msg: 'Artist has been deleted' } };
+    if (!artist)
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    return new ArtistEntity(artist);
+    // } catch {
+    //   // console.log('not found');
+    // }
+  }
+
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    try {
+      const updArtist = await this.prisma.artist.update({
+        where: { id: id },
+        data: { ...updateArtistDto },
+      });
+      return new ArtistEntity(updArtist);
+    } catch {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.prisma.artist.delete({ where: { id: id } });
+      await this.prisma.album.updateMany({
+        where: { artistId: id },
+        data: { artistId: null },
+      });
+      await this.prisma.track.updateMany({
+        where: { artistId: id },
+        data: { artistId: null },
+      });
+    } catch {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
   }
 }

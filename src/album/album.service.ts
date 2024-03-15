@@ -4,9 +4,11 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { albumsDB } from 'db/album/artistDB';
 import { tracksDB } from 'db/track/tracksDB';
 import { favsDB } from 'db/favs/favsDB';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlbumService {
+  constructor(private prisma: PrismaService) {}
   create(createAlbumDto: CreateAlbumDto) {
     const newAlbum = albumsDB.postAlbum(createAlbumDto);
     return { status: 201, data: newAlbum };
