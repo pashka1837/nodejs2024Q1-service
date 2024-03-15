@@ -34,16 +34,14 @@ export class ArtistService {
   }
 
   async findOne(id: string) {
-    // try {
-    const artist = await this.prisma.artist.findUnique({
-      where: { id: id },
-    });
-    if (!artist)
+    try {
+      const artist = await this.prisma.artist.findUniqueOrThrow({
+        where: { id: id },
+      });
+      return new ArtistEntity(artist);
+    } catch {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-    return new ArtistEntity(artist);
-    // } catch {
-    //   // console.log('not found');
-    // }
+    }
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto) {

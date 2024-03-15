@@ -26,7 +26,7 @@ export class UserService {
 
   async findOne(id: string) {
     try {
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findUniqueOrThrow({
         where: { id: id },
       });
       return new UserEntity(user);

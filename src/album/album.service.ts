@@ -1,43 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { albumsDB } from 'db/album/artistDB';
-import { tracksDB } from 'db/track/tracksDB';
-import { favsDB } from 'db/favs/favsDB';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AlbumEntity } from './entity/album.entity';
 
 @Injectable()
 export class AlbumService {
   constructor(private prisma: PrismaService) {}
-  create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = albumsDB.postAlbum(createAlbumDto);
-    return { status: 201, data: newAlbum };
+  async create(createAlbumDto: CreateAlbumDto) {
+    try {
+      const newAlbum = await this.prisma.album.create({
+        data: { ...createAlbumDto },
+      });
+      return new AlbumEntity(newAlbum);
+    } catch {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  findAll() {
-    const albums = albumsDB.getAlbums();
-    return { status: 200, data: albums };
+  async findAll() {
+    try {
+      const albums = await this.prisma.album.findMany();
+      return albums.map((alb) => new AlbumEntity(alb));
+    } catch {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  findOne(id: string) {
-    const album = albumsDB.getAlbumById(id);
-    if (!album) return { status: 404, data: { msg: 'Album not found' } };
-    return { status: 200, data: album };
+  async findOne(id: string) {
+    try {
+      const album = await this.prisma.album.findUniqueOrThrow({
+        where: { id: id },
+      });
+      return new AlbumEntity(album);
+    } catch {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const updAlbum = albumsDB.putAlbum(updateAlbumDto, id);
-    if (!updAlbum) return { status: 404, data: { msg: 'Album not found' } };
-    return { status: 200, data: updAlbum };
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    try {
+      console.log(id, updateAlbumDto);
+      const updAlbum = await this.prisma.album.update({
+        where: { id: id },
+        data: { ...updateAlbumDto },
+      });
+      console.log(updAlbum);
+      return new AlbumEntity(updAlbum);
+    } catch {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
   }
 
-  remove(id: string) {
-    const isAlbumDel = albumsDB.deleteAlbum(id);
-    if (!isAlbumDel) return { status: 404, data: { msg: 'Album not found' } };
-    tracksDB.getTracks().forEach((track) => {
-      if (track.albumId === id) track.albumId = null;
-    });
-    favsDB.deleteAlbum(id);
-    return { status: 204, data: { msg: 'Album has been deleted' } };
+  async remove(id: string) {
+    try {
+      await this.prisma.album.delete({ where: { id: id } });
+      await this.prisma.track.updateMany({
+        where: { albumId: id },
+        data: { albumId: null },
+      });
+    } catch {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
   }
 }

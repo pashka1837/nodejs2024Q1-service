@@ -7,6 +7,8 @@ import {
   Delete,
   Put,
   ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -18,20 +20,17 @@ export class AlbumController {
 
   @Post()
   create(@Body() createAlbumDto: CreateAlbumDto) {
-    // const { status, data } = this.albumService.create(createAlbumDto);
-    // return response.status(status).json(data);
+    return this.albumService.create(createAlbumDto);
   }
 
   @Get()
   findAll() {
-    // const { status, data } = this.albumService.findAll();
-    // return response.status(status).json(data);
+    return this.albumService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    // const { status, data } = this.albumService.findOne(id);
-    // return response.status(status).json(data);
+    return this.albumService.findOne(id);
   }
 
   @Put(':id')
@@ -39,13 +38,13 @@ export class AlbumController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    // const { status, data } = this.albumService.update(id, updateAlbumDto);
-    // return response.status(status).json(data);
+    console.log(updateAlbumDto);
+    return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    // const { status, data } = this.albumService.remove(id);
-    // return response.status(status).json(data);
+    return this.albumService.remove(id);
   }
 }

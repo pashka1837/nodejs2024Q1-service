@@ -3,9 +3,9 @@ import { Exclude } from 'class-transformer';
 
 export class AlbumEntity {
   id: string;
-  artistId: string | null;
   name: string;
   year: number;
+  artistId: string | null;
   @Exclude()
   favsId: string;
   constructor(partial: Partial<AlbumPrisma>) {
