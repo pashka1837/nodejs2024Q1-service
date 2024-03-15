@@ -6,59 +6,44 @@ import {
   Param,
   Delete,
   Put,
-  UsePipes,
-  ValidationPipe,
-  Res,
   ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Response } from 'express';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  create(@Res() response: Response, @Body() createTrackDto: CreateTrackDto) {
-    const { status, data } = this.trackService.create(createTrackDto);
-    return response.status(status).json(data);
+  create(@Body() createTrackDto: CreateTrackDto) {
+    return this.trackService.create(createTrackDto);
   }
 
   @Get()
-  findAll(@Res() response: Response) {
-    const { status, data } = this.trackService.findAll();
-    return response.status(status).json(data);
+  findAll() {
+    return this.trackService.findAll();
   }
 
   @Get(':id')
-  findOne(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.trackService.findOne(id);
-    return response.status(status).json(data);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.trackService.findOne(id);
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
   update(
-    @Res() response: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    const { status, data } = this.trackService.update(id, updateTrackDto);
-    return response.status(status).json(data);
+    return this.trackService.update(id, updateTrackDto);
   }
 
   @Delete(':id')
-  remove(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.trackService.remove(id);
-    return response.status(status).json(data);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.trackService.remove(id);
   }
 }

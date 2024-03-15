@@ -38,7 +38,6 @@ export class AlbumController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    console.log(updateAlbumDto);
     return this.albumService.update(id, updateAlbumDto);
   }
 

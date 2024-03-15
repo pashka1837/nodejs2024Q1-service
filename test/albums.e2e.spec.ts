@@ -165,7 +165,6 @@ describe('Album (e2e)', () => {
 
       expect(creationArtistResponse.statusCode).toBe(StatusCodes.CREATED);
       const { id: updateArtistId } = creationArtistResponse.body;
-      console.log(updateArtistId, createdId);
       // Preparation end
 
       const updateResponse = await unauthorizedRequest
@@ -180,7 +179,6 @@ describe('Album (e2e)', () => {
       expect(updateResponse.statusCode).toBe(StatusCodes.OK);
 
       const { id: updatedId, name, year, artistId } = updateResponse.body;
-      console.log(updatedId, name, year, artistId);
 
       expect(name).toBe(createAlbumDto.name);
       expect(year).toBe(updatedYear);

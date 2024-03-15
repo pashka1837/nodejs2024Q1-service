@@ -8,15 +8,8 @@ import { UserEntity } from './entities/user.entity';
 export class UserService {
   constructor(private prisma: PrismaService) {}
   async create(postUser: CreateUserDto) {
-    try {
-      const newUser = await this.prisma.user.create({ data: { ...postUser } });
-      return new UserEntity(newUser);
-    } catch {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const newUser = await this.prisma.user.create({ data: { ...postUser } });
+    return new UserEntity(newUser);
   }
 
   async findAll() {

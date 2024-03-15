@@ -8,29 +8,15 @@ import { AlbumEntity } from './entity/album.entity';
 export class AlbumService {
   constructor(private prisma: PrismaService) {}
   async create(createAlbumDto: CreateAlbumDto) {
-    try {
-      const newAlbum = await this.prisma.album.create({
-        data: { ...createAlbumDto },
-      });
-      return new AlbumEntity(newAlbum);
-    } catch {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const newAlbum = await this.prisma.album.create({
+      data: { ...createAlbumDto },
+    });
+    return new AlbumEntity(newAlbum);
   }
 
   async findAll() {
-    try {
-      const albums = await this.prisma.album.findMany();
-      return albums.map((alb) => new AlbumEntity(alb));
-    } catch {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const albums = await this.prisma.album.findMany();
+    return albums.map((alb) => new AlbumEntity(alb));
   }
 
   async findOne(id: string) {
@@ -46,12 +32,10 @@ export class AlbumService {
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
     try {
-      console.log(id, updateAlbumDto);
       const updAlbum = await this.prisma.album.update({
         where: { id: id },
         data: { ...updateAlbumDto },
       });
-      console.log(updAlbum);
       return new AlbumEntity(updAlbum);
     } catch {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);

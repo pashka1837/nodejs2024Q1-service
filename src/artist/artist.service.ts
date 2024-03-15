@@ -8,29 +8,15 @@ import { ArtistEntity } from './entities/artist.entity';
 export class ArtistService {
   constructor(private prisma: PrismaService) {}
   async create(createArtistDto: CreateArtistDto) {
-    try {
-      const newArtist = await this.prisma.artist.create({
-        data: { ...createArtistDto },
-      });
-      return new ArtistEntity(newArtist);
-    } catch {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const newArtist = await this.prisma.artist.create({
+      data: { ...createArtistDto },
+    });
+    return new ArtistEntity(newArtist);
   }
 
   async findAll() {
-    try {
-      const artists = await this.prisma.artist.findMany();
-      return artists.map((art) => new ArtistEntity(art));
-    } catch {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const artists = await this.prisma.artist.findMany();
+    return artists.map((art) => new ArtistEntity(art));
   }
 
   async findOne(id: string) {
