@@ -1,59 +1,68 @@
 import { Injectable } from '@nestjs/common';
-import { favsDB } from 'db/favs/favsDB';
-import { albumsDB } from 'db/album/artistDB';
-import { FavoritesResponse } from './entities/fav.entity';
-import { tracksDB } from 'db/track/tracksDB';
-import { artistsDB } from 'db/artist/artistDB';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { createFav, deleteFav } from 'src/utils/utils';
 
 @Injectable()
 export class FavsService {
-  findAll() {
-    const favs = favsDB.getAll();
-
-    const returnFavs = new FavoritesResponse({
-      albums: favs.albums.map((id) => albumsDB.getAlbumById(id)),
-      tracks: favs.tracks.map((id) => tracksDB.getTrackById(id)),
-      artists: favs.artists.map((id) => artistsDB.getArtistById(id)),
+  private favsId: string;
+  constructor(private prisma: PrismaService) {
+    prisma.favs.findFirst().then((favs) => {
+      this.favsId = favs.id;
     });
-
-    return { status: 200, data: returnFavs };
+  }
+  async findAll() {
+    const [favs] = await this.prisma.favs.findMany({
+      select: {
+        id: false,
+        albums: {
+          select: {
+            id: true,
+            name: true,
+            year: true,
+            artistId: true,
+          },
+        },
+        artists: {
+          select: {
+            id: true,
+            name: true,
+            grammy: true,
+          },
+        },
+        tracks: {
+          select: {
+            id: true,
+            name: true,
+            duration: true,
+            albumId: true,
+            artistId: true,
+          },
+        },
+      },
+    });
+    return favs;
   }
 
-  createTrack(id: string) {
-    const isExist = tracksDB.getTrackById(id);
-    if (!isExist) return { status: 422, data: { msg: 'Track not found' } };
-    favsDB.postTrack(id);
-    return { status: 201, data: { msg: 'Track added to favourites' } };
+  async createTrack(id: string) {
+    await createFav(this.prisma, id, this.favsId, 'track');
   }
 
-  deleteTrack(id: string) {
-    return favsDB.deleteTrack(id)
-      ? { status: 204, data: { msg: 'Track was deleted frpm favourites' } }
-      : { status: 404, data: { msg: 'Track not found' } };
+  async deleteTrack(id: string) {
+    await deleteFav(this.prisma, id, 'track');
   }
 
-  createAlbum(id: string) {
-    const isExist = albumsDB.getAlbumById(id);
-    if (!isExist) return { status: 422, data: { msg: 'Album not found' } };
-    favsDB.postAlbum(id);
-    return { status: 201, data: { msg: 'Album added to favourites' } };
+  async createAlbum(id: string) {
+    await createFav(this.prisma, id, this.favsId, 'album');
   }
 
-  deleteAlbum(id: string) {
-    return favsDB.deleteAlbum(id)
-      ? { status: 204, data: { msg: 'Album was deleted frpm favourites' } }
-      : { status: 404, data: { msg: 'Album not found' } };
+  async deleteAlbum(id: string) {
+    await deleteFav(this.prisma, id, 'album');
   }
-  createArtist(id: string) {
-    const isExist = artistsDB.getArtistById(id);
-    if (!isExist) return { status: 422, data: { msg: 'Artist not found' } };
-    favsDB.postArtist(id);
-    return { status: 201, data: { msg: 'Artist added to favourites' } };
+  async createArtist(id: string) {
+    await createFav(this.prisma, id, this.favsId, 'artist');
   }
 
-  deleteArtist(id: string) {
-    return favsDB.deleteArtist(id)
-      ? { status: 204, data: { msg: 'Artist was deleted frpm favourites' } }
-      : { status: 404, data: { msg: 'Artist not found' } };
+  async deleteArtist(id: string) {
+    await deleteFav(this.prisma, id, 'artist');
   }
 }

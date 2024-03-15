@@ -50,8 +50,8 @@ model Track {
 }
 
 model Favs {
-  id     String   @id @default(uuid())
-  artist Artist[]
-  albums Album[]
-  tracks Track[]
+  id      String   @id @default(uuid())
+  artists Artist[]
+  albums  Album[]
+  tracks  Track[]
 }

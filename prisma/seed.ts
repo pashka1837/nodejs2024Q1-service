@@ -101,6 +101,13 @@ async function main() {
       albumId: album2.id,
     },
   });
+
+  const favs = await prisma.favs.upsert({
+    where: { id: 'xxx' },
+    update: {},
+    create: {},
+  });
+
   console.log(user1, artist1, album1);
 }
 

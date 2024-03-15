@@ -4,73 +4,51 @@ import {
   Post,
   Param,
   Delete,
-  Res,
   ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { FavsService } from './favs.service';
-import { Response } from 'express';
 
 @Controller('favs')
 export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Get()
-  findAll(@Res() response: Response) {
-    const { status, data } = this.favsService.findAll();
-    return response.status(status).json(data);
+  findAll() {
+    return this.favsService.findAll();
   }
 
   @Post('track/:id')
-  createTrack(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.createTrack(id);
-    return response.status(status).json(data);
+  createTrack(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.createTrack(id);
   }
 
   @Delete('track/:id')
-  removeTrack(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.deleteTrack(id);
-    return response.status(status).json(data);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeTrack(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.deleteTrack(id);
   }
 
   @Post('album/:id')
-  createAlbum(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.createAlbum(id);
-    return response.status(status).json(data);
+  createAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.createAlbum(id);
   }
 
   @Delete('album/:id')
-  removeAlbum(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.deleteAlbum(id);
-    return response.status(status).json(data);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeAlbum(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.deleteAlbum(id);
   }
 
   @Post('artist/:id')
-  createArtist(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.createArtist(id);
-    return response.status(status).json(data);
+  createArtist(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.createArtist(id);
   }
 
   @Delete('artist/:id')
-  removeArtist(
-    @Res() response: Response,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    const { status, data } = this.favsService.deleteArtist(id);
-    return response.status(status).json(data);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeArtist(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.favsService.deleteArtist(id);
   }
 }
