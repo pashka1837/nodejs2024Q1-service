@@ -4,11 +4,16 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker
+- WSL
+
+## Docker hub posting 
+- https://hub.docker.com/r/pashka1837/home_lib/tags
 
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/pashka1837/nodejs2024Q1-service.git
 ```
 
 ## Installing NPM modules
@@ -17,15 +22,21 @@ git clone {repository URL}
 npm install
 ```
 
+## Make sure ports 4000 and 5432 are free
+
+## Rename .env.example to .env
+
 ## Running application
 
 ```
-npm start
+docker compose up
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+## Running vurnelabilities test
+
+```
+npm run docker:scout
+```
 
 ## Testing
 
@@ -41,18 +52,6 @@ To run only one of all test suites
 
 ```
 npm run test -- <path to suite>
-```
-
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
 ```
 
 ### Auto-fix and format

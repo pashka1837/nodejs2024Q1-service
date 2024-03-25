@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  main:
+    container_name: main
+    image: pashka1837/home_lib:main
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '${PORT}:${PORT}'
+    networks:
+      - my-network
+    depends_on:
+      - postgres
+    restart: always
+    
+  postgres:
+    container_name: postgres
+    image: pashka1837/home_lib:postgres
+    build: 
+      context: ./postgres
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - postgres-logs:/var/log/postgresql
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    restart: always
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    name: ${NETWORK}
+    driver: ${DRIVER}
+  
+
+volumes:
+  postgres-data:
+  postgres-logs:
+    

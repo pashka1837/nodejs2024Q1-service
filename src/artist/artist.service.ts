@@ -1,0 +1,60 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ArtistEntity } from './entities/artist.entity';
+
+@Injectable()
+export class ArtistService {
+  constructor(private prisma: PrismaService) {}
+  async create(createArtistDto: CreateArtistDto) {
+    const newArtist = await this.prisma.artist.create({
+      data: { ...createArtistDto },
+    });
+    return new ArtistEntity(newArtist);
+  }
+
+  async findAll() {
+    const artists = await this.prisma.artist.findMany();
+    return artists.map((art) => new ArtistEntity(art));
+  }
+
+  async findOne(id: string) {
+    try {
+      const artist = await this.prisma.artist.findUniqueOrThrow({
+        where: { id: id },
+      });
+      return new ArtistEntity(artist);
+    } catch {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    try {
+      const updArtist = await this.prisma.artist.update({
+        where: { id: id },
+        data: { ...updateArtistDto },
+      });
+      return new ArtistEntity(updArtist);
+    } catch {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.prisma.artist.delete({ where: { id: id } });
+      await this.prisma.album.updateMany({
+        where: { artistId: id },
+        data: { artistId: null },
+      });
+      await this.prisma.track.updateMany({
+        where: { artistId: id },
+        data: { artistId: null },
+      });
+    } catch {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+  }
+}
