@@ -4,6 +4,8 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker
+- WSL
 
 ## Downloading
 
@@ -19,7 +21,9 @@ npm install
 
 ## Make sure ports 4000 and 5432 are free
 
-## Running docker
+## Rename .env.example to .env
+
+## Running application
 
 ```
 docker compose up
