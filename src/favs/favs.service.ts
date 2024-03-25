@@ -6,9 +6,16 @@ import { createFav, deleteFav } from 'src/utils/utils';
 export class FavsService {
   private favsId: string;
   constructor(private prisma: PrismaService) {
-    prisma.favs.findFirst().then((favs) => {
-      this.favsId = favs.id;
-    });
+    prisma.favs
+      .findFirstOrThrow()
+      .then((favs) => {
+        this.favsId = favs.id;
+      })
+      .catch(async () => {
+        prisma.favs.create({ data: {} }).then((favs) => {
+          this.favsId = favs.id;
+        });
+      });
   }
   async findAll() {
     const [favs] = await this.prisma.favs.findMany({

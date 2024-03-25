@@ -16,7 +16,9 @@ import { PrismaModule } from './prisma/prisma.module';
     AlbumModule,
     TrackModule,
     FavsModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: `.env`,
+    }),
     PrismaModule,
   ],
   controllers: [AppController],
