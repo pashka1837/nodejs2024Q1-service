@@ -3,7 +3,7 @@ version: '3.9'
 services:
   main:
     container_name: main
-    image: home_lib:main
+    image: pashka1837/home_lib:main
     build: 
       context: .
       dockerfile: Dockerfile
@@ -24,9 +24,9 @@ services:
     
   postgres:
     container_name: postgres
-    image: home_lib:postgres
+    image: pashka1837/home_lib:postgres
     build: 
-      context: ./db
+      context: ./postgres
       dockerfile: Dockerfile
     env_file:
       - .env

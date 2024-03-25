@@ -17,21 +17,19 @@ git clone https://github.com/pashka1837/nodejs2024Q1-service.git
 npm install
 ```
 
-## Rename 
+## Make sure ports 4000 and 5432 are free
+
+## Running docker
 
 ```
-.env.example file to .env
+docker compose up
 ```
 
-## Running application
+## Running vurnelabilities test
 
 ```
-npm start
+npm run docker:scout
 ```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
