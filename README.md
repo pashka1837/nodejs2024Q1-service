@@ -7,6 +7,9 @@
 - Docker
 - WSL
 
+## Docker hub posting 
+- https://hub.docker.com/r/pashka1837/home_lib/tags
+
 ## Downloading
 
 ```
